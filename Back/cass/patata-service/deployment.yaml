@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: patata-service
+  labels:
+    app: patata-service
+spec:
+  type: NodePort
+  ports:
+  - port: 9100
+    protocol: TCP
+    targetPort: 9100
+    nodePort: 30007
+  selector:
+    app: patata-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: patata-service
+  namespace: default
+  labels:
+    app: patata-service
+spec:
+  replicas: 15
+  selector:
+    matchLabels:
+      app: patata-service
+  template:
+    metadata:
+      labels:
+        app: patata-service
+    spec:
+      containers:
+      - name: patata-service
+        image: lgracia/dev:patata-service 
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: 200m
+            memory: 756Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        env:
+        - name: NODE_ENV
+          value: development
+        ports:
+        - containerPort: 9100
